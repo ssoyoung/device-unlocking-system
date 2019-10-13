@@ -43,7 +43,7 @@ PoC code for device(scooter) lock/unlock system
 
 
 - to do list
-    1. Paring code connection
+    1. Pairing code connection
     2. Reset usability flag functionality
     3. Lock/Unlock functionaility
-    4. Implemnt watch function in mongodb
+    4. Implement watch function in mongodb
