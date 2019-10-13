@@ -356,7 +356,7 @@ async function checkPairing(pairingData, pairingCb) {
             session.endSession();    
             pairingCb({
                 code: 404,
-                message: 'wrong pairing information'
+                message: 'wrong pairing info entered or already paired'
             });
             return;    
         }

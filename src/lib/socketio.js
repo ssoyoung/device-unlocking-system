@@ -18,7 +18,7 @@ io.on('connection', function(socket){
         dbmanager.makeOtp(phoneNumber, vin, (makeCb) => {
 
             if(makeCb.code !== 200) {
-                socket.emit('no otp', makeCb.message);
+                socket.emit('no otp', makeCb.message, '(' + makeCb.code +')');
             } else {
                 const otpData = makeCb.message;
                 socket.emit('new otp', otpData);    
@@ -35,7 +35,7 @@ io.on('connection', function(socket){
 
         dbmanager.otpCheck(data, (checkCb) =>{
             if(checkCb.code !== 200) {
-                socket.emit('no otp', checkCb.message);
+                socket.emit('no otp', checkCb.message + '(' + checkCb.code + ')');
             } else {
                 socket.emit('otp success', checkCb.message);
            
@@ -43,7 +43,7 @@ io.on('connection', function(socket){
                 // SEND PAIR CODE TO VEHICLE (Assume)
                 dbmanager.startPairing(data.vin, (pairingCb) => {
                     if(pairingCb.code !== 200){
-                        socket.emit('pairing error', pairingCb.message);
+                        socket.emit('pairing error', pairingCb.message + '(' + pairingCb.code + ')');
                     } else{
                         socket.emit('pairing code', pairingCb.message);
                     } 
@@ -57,7 +57,7 @@ io.on('connection', function(socket){
     socket.on('send pairing', (data) => {
         dbmanager.checkPairing(data, (pairingCb) => {
             if(pairingCb.code !== 200) {
-                socket.emit('pair err', pairingCb.message);
+                socket.emit('pair err', pairingCb.message + '(' + pairingCb.code + ')');
             } else {
                 socket.emit('pair success', pairingCb.message);
             }
@@ -66,7 +66,7 @@ io.on('connection', function(socket){
 
     socket.on('locked', (data) => {
         dbmanager.setVehicleLock(data, (setCb) => {
-            socket.emit('locked', (setCb).message);
+            socket.emit('locked', (setCb).message + '(' + setCb.code + ')');
         });
     });
     
