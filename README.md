@@ -3,16 +3,16 @@ PoC code for device(scooter) lock/unlock system
 
 - How to install & run
     1. Run docker compose build
-        $ docker-compose build
+>       $ docker-compose build
 
     2. Run docker compose up
-        $ docker-compose up
+>       $ docker-compose up
 
         ** caution
         - there are 3 mongo db (for transaction & watch)
-            . but watch function is not implemented this time (TO-DO)
+            - but watch function is not implemented this time (TO-DO)
         - time is needed to run all process successfully
-            . when you see below message in console, youn can use device-unlocking-system
+            - when you see below message in console, youn can use device-unlocking-system
             
             unlocking-server  | success to connect mongo DB!
 
