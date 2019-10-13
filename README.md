@@ -19,8 +19,12 @@ PoC code for device(scooter) lock/unlock system
             unlocking-server  | success to connect mongo DB!
 
    #3. Go to client website for test
+        
         - Enter http://localhost:3000 in browser
+        
+        
         - you can use below functionality
+        
             (1) User Account Creation
                 : Create new user (user duplication check)
             (2) Vehicle Creation
@@ -31,6 +35,8 @@ PoC code for device(scooter) lock/unlock system
                 : OTP validty check (maximum 3 times)
 
    #4. etc
+   
+   
         - if you want to volume option for persistent storage,
            comment out volume in docker-compose.yml
 
