@@ -41,7 +41,7 @@
                 <br>
                 <button id="send-otp" class="btn btn-success">SEND OTP</button>
 
-                <h3>5. (###NOT IMPLEMENTED YET###) Paring</h3> 
+                <h3>5. (###NOT IMPLEMENTED YET###) Pairing</h3> 
                 <input id="paring-code" class="form-control" placeholder="paring code">
                 </input>
                 <br>
@@ -51,8 +51,8 @@
         </div>
     <script>
     // client side javascript code
-    // var url = 'http://localhost:3000';
-    var url = 'http://unlocking-server:3000';
+    var url = 'http://localhost:3000';
+    // var url = 'http://unlocking-server';
 
     var socket = io.connect(url);
     socket.on('new otp', (data) => {
