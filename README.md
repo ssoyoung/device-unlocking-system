@@ -14,7 +14,7 @@ PoC code for device(scooter) lock/unlock system
         - there are 3 mongo db (for transaction & watch)
             - but watch function is not implemented this time (TO-DO)
         - time is needed to run all process successfully
-            - when you see below message in console, youn can use device-unlocking-system
+            - when you see below message in console, you can use device-unlocking-system
             
             unlocking-server  | success to connect mongo DB!
 
@@ -52,7 +52,7 @@ PoC code for device(scooter) lock/unlock system
    
    
         - if you want to volume option for persistent storage,
-           comment out volume in docker-compose.yml
+           comment out volume in docker-compose.yml file
 
 
 
