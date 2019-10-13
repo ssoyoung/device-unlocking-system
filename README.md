@@ -71,3 +71,4 @@ PoC code for device(vehicle) lock/unlock system
 - to do list
     1. Pairing session timeout error functionality
     2. Code Refactoring & Stablization
+    3. Unit test code (Behavioral Driven Testing)
