@@ -5,7 +5,7 @@ mongoose.set('useFindAndModify', true);
 
 const Schema = mongoose.Schema;
 const VehicleSechema = new Schema({
-    vin: String,
+    vin: {type: String, required : true},
     usability: Boolean,
     phoneNumber: String,
     paired: Boolean,

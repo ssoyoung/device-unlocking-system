@@ -95,7 +95,7 @@ async function initCollection()
         if(findCb === null || findCb.length === 0) {
             // make ticket collection
             let ua = new UserAccount({
-                userId :"na",
+                phoneNumber :"na",
                 vins : [],
                 otp: 0000,
                 retry: 0
