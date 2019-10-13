@@ -17,7 +17,7 @@ io.on('connection', function(socket){
             console.log('makeCb is called');
 
             if(makeCb.code !== 200) {
-                socket.emit('otp error : ', makeCb.message);
+                socket.emit('no otp', makeCb.message);
             } else {
                 const otpData = makeCb.message;
                 socket.emit('new otp', otpData);    

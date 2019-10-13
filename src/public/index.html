@@ -59,8 +59,9 @@
         alert('OTP CODE : ' + data);
     });
 
-    socket.on('otp error', (data) => {
+    socket.on('no otp', (data) => {
       // alert('ERROR : ' + data.message + '(code : ' + data.code + ')');
+      console.log(data);
       alert('ERROR : ' + data);
     });
 
