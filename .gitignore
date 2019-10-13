@@ -1,0 +1,5 @@
+node_modules
+dist
+db/mongo0/data
+db/mongo1/data
+db/mongo2/data
