@@ -72,3 +72,4 @@ PoC code for device(vehicle) lock/unlock system
     1. Pairing session timeout error functionality
     2. Code Refactoring & Stablization
     3. Unit test code (Behavioral Driven Testing)
+    4. Phone number validation check
