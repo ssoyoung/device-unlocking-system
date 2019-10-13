@@ -213,6 +213,11 @@ async function otpCheck(info, checkCb)
     const vin = info.vin;
     const otp = info.otp;
 
+    // mongo transaction session
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    const opts = { session };
+    
     try {
         const userCondition = {
             phoneNumber : phoneNumber
@@ -242,6 +247,8 @@ async function otpCheck(info, checkCb)
                 retry : 0
             };
             await UserAccount.findOneAndUpdate(userCondition, updateUser, updateOptions);
+            await session.commitTransaction();
+            session.endSession();    
 
             checkCb({
                 code: 200,
@@ -258,7 +265,9 @@ async function otpCheck(info, checkCb)
                 retry:  userFound.retry + 1
             };
             await UserAccount.findOneAndUpdate(userCondition, updateUser, updateOptions);
-
+            await session.commitTransaction();
+            session.endSession();
+    
             checkCb({
                 code: 401,
                 message: 'otp code is wrong'
@@ -266,6 +275,9 @@ async function otpCheck(info, checkCb)
             return;
         }
     } catch(err) {
+        await session.abortTransaction();
+        session.endSession();
+
         checkCb({
             code: 500,
             message: err
