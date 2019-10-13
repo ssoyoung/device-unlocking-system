@@ -37,6 +37,17 @@ io.on('connection', function(socket){
                 socket.emit('no otp', checkCb.message);
             } else {
                 socket.emit('otp success', checkCb.message);
+           
+                // **********************************
+                // SEND PAIR CODE TO VEHICLE (Assume)
+                dbmanager.startPairing(data.vin, (pairingCb) => {
+                    if(pairingCb.code !== 200){
+                        socket.emit('pairing error', pairingCb.message);
+                    } else{
+                        socket.emit('pairing code', pairingCb.message);
+                    } 
+                });
+
             }
         });
     });

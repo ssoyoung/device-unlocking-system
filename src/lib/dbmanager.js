@@ -255,8 +255,7 @@ async function otpCheck(info, checkCb)
                 message: 'otp matched!'
             });
 
-            // **********************************
-            // TODO : SEND PAIR CODE TO VEHICLE
+
             return;
         } else {
 
@@ -285,9 +284,50 @@ async function otpCheck(info, checkCb)
     }
 }
 
-// transaction
+async function startPairing(vin, paringCb)
+{
+    // Generating pairing number
+    const findCondition = {
+        vin: vin,
+        paired: false,
+        usability: true
+    };
+
+    const pairCode = await generateCode();
+
+    const updateData = {
+        pairCode: pairCode
+    };
+
+    try {
+        const found = await Vehicle.findOne(findCondition);
+        if(found === null) {
+            paringCb({
+                code: 404,
+                message: 'invalid vehicle selected'
+            });
+            return;
+        }
+        
+        await Vehicle.findOneAndUpdate(findCondition, updateData, updateOptions);
+        paringCb({
+            code: 200,
+            message: pairCode
+        });
+        return;
+    } catch(err) {
+        logger.error('vehicle pairing code update error');
+        logger.error(err);
+        paringCb({
+            code : 500,
+            message : 'SERVER ERROR'
+        })
+    }
+
+}
 
 exports.createUser = createUser;
 exports.createVehicle = createVehicle;
 exports.makeOtp = makeOtp;
 exports.otpCheck = otpCheck;
+exports.startPairing = startPairing;
