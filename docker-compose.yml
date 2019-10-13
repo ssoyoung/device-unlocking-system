@@ -6,8 +6,8 @@ services:
     image: mongo
     ports:
       - 27017:27017
-    volumes:
-      - ./db/mongo0/data:/data/db
+    # volumes:
+    #   - ./db/mongo0/data:/data/db
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
@@ -17,8 +17,8 @@ services:
     image: mongo
     ports:
       - 27018:27017
-    volumes:
-      - ./db/mongo1/data:/data/db
+    # volumes:
+    #   - ./db/mongo1/data:/data/db
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
@@ -28,8 +28,8 @@ services:
     image: mongo
     ports:
       - 27019:27017
-    volumes:
-      - ./db/mongo2/data:/data/db
+    # volumes:
+    #   - ./db/mongo2/data:/data/db
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
