@@ -445,7 +445,7 @@ async function setVehicleLock(vhInfo, lockCb)
 
         else
             lockCb({
-                coee: 400,
+                code: 400,
                 message: 'can not lock the device'
             });
     } catch(err) {
@@ -457,6 +457,73 @@ async function setVehicleLock(vhInfo, lockCb)
     }
 }
 
+async function resetProcess(resetInfo, resetCb)
+{
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {    
+
+        const userCondition = {
+            phoneNumber: resetInfo.phoneNumber
+        };
+        // BUG : DOES NOT PROPERY WORKED
+        const userUpdate=  {
+            retry: 0,
+            $pull: {'vins': {'vin' : [resetInfo.vin]}}
+        };
+
+        const updated = await UserAccount.findOneAndUpdate(userCondition, userUpdate, updateOptions);
+        if(updated === null) {
+            await session.abortTransaction();
+            session.endSession();        
+            resetCb({
+                code: 404,
+                message : 'no such user exist'
+            });
+            return;
+        }
+
+        const vhCondition = {
+            vin: resetInfo.vin
+        };
+        const foundVh = Vehicle.findOne(vhCondition);
+        if(foundVh === null) {
+            await session.abortTransaction();
+            session.endSession();
+            resetCb({
+                code: 404,
+                message : 'no such vehicle exist'
+            });
+            return;
+        }
+        
+        const vhUpdate = {
+            usability: true,
+            paired: false,
+            phoneNumber: ''
+        }
+        await Vehicle.updateOne(vhCondition, vhUpdate, updateOptions);
+        await session.commitTransaction();
+        session.endSession();    
+
+        resetCb({
+            code: 200,
+            message: 'reset successfully'
+        });
+
+    } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
+
+        logger.error(err);
+        resetCb({
+            code: 500,
+            message: 'INTERNAL SERVER ERROR'
+        });
+    }
+}
+
 exports.createUser = createUser;
 exports.createVehicle = createVehicle;
 exports.makeOtp = makeOtp;
@@ -464,3 +531,4 @@ exports.otpCheck = otpCheck;
 exports.startPairing = startPairing;
 exports.checkPairing = checkPairing;
 exports.setVehicleLock = setVehicleLock;
+exports.resetProcess = resetProcess;

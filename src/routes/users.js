@@ -12,4 +12,15 @@ router.put('/', function(req, res) {
     });
 });
 
+/*
+ * POST /users/reset
+  : reset specific user's retry field value to 0
+ */
+router.post('/reset', function(req, res) {
+    dbmanager.resetProcess(req.body, (resetCb) => {
+        res.status(resetCb.code).send(resetCb.message);
+    });
+});
+
+
 module.exports = router;
