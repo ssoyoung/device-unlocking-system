@@ -1,5 +1,5 @@
 # device-unlocking-system
-PoC code for device(scooter) lock/unlock system
+PoC code for device(vehicle) lock/unlock system
 
 - How to install & run
 
@@ -13,7 +13,7 @@ PoC code for device(scooter) lock/unlock system
         ** caution
         - there are 3 mongo db (for transaction & watch)
             - but watch function is not implemented this time (TO-DO)
-        - time is needed to run all process successfully
+        - time is needed for all docker containers to be run successfully
             - when you see below message in console, you can use device-unlocking-system
             
             unlocking-server  | success to connect mongo DB!
