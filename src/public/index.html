@@ -46,6 +46,11 @@
                 </input>
                 <br>
                 <button id="send-pairing" class="btn btn-success">PAIRING</button>
+
+                <h3>6. Lock/Unlock </h3>
+                <button id="lock" class="btn btn-success">LOCK</button>
+                <button id="unlock" class="btn btn-fail">UNLOCK</button>
+
             </div>
 
         </div>
@@ -77,6 +82,9 @@
         alert('VEHICLE DISPLAY (PAIRING CODE) : ' + data);
     });
     socket.on('pair success', (data) => {
+        alert(data);
+    });
+    socket.on('locked', (data) => {
         alert(data);
     });
 
@@ -150,6 +158,29 @@
                 pairCode : $("#pair-code").val()
             };
             socket.emit('send pairing', data);
+        });
+    });
+
+
+    $(function () {
+        $("#lock").click(()=>{
+          const data = {
+                phoneNumber : $("#otp-phone-number").val(),
+                vin : $("#otp-vehicle-id").val(),
+                locked : true
+            };
+            socket.emit('locked', data);
+        });
+    });
+
+    $(function () {
+        $("#unlock").click(()=>{
+          const data = {
+                phoneNumber : $("#otp-phone-number").val(),
+                vin : $("#otp-vehicle-id").val(),
+                locked : false
+            };
+            socket.emit('locked', data);
         });
     });
 

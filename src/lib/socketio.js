@@ -2,6 +2,8 @@ var socket_io = require('socket.io');
 var io       = socket_io();
 var socketio = {};
 socketio.io  = io;
+var tracer = require('tracer');
+const logger = tracer.colorConsole();
 
 var dbmanager = require('./dbmanager');
 
@@ -14,7 +16,6 @@ io.on('connection', function(socket){
         const vin = data.vin;
 
         dbmanager.makeOtp(phoneNumber, vin, (makeCb) => {
-            console.log('makeCb is called');
 
             if(makeCb.code !== 200) {
                 socket.emit('no otp', makeCb.message);
@@ -55,9 +56,6 @@ io.on('connection', function(socket){
 
     socket.on('send pairing', (data) => {
         dbmanager.checkPairing(data, (pairingCb) => {
-            console.log('pairing CB is called');
-            console.log(pairingCb.code);
-            console.log(pairingCb.message);
             if(pairingCb.code !== 200) {
                 socket.emit('pair err', pairingCb.message);
             } else {
@@ -65,11 +63,17 @@ io.on('connection', function(socket){
             }
         });
     });
+
+    socket.on('locked', (data) => {
+        dbmanager.setVehicleLock(data, (setCb) => {
+            socket.emit('locked', (setCb).message);
+        });
+    });
     
 });
 
 io.on('dissconnection', function(socket){
-
+    logger.log('disconnected ' + socket.id);
 });
  
 module.exports = socketio;

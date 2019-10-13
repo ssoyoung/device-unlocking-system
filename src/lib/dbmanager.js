@@ -418,7 +418,43 @@ async function checkPairing(pairingData, pairingCb) {
             message: 'SERVER ERROR'
         });
     }
+}
 
+async function setVehicleLock(vhInfo, lockCb)
+{
+    try {
+        const foundOne = await Vehicle.findOne({vin: vhInfo.vin});
+        if(foundOne === null) {
+            lockCb({
+                code: 400,
+                message: "no such vehicle exist"
+            });
+            return;
+        }
+    
+        const findQuery = {
+            vin : vhInfo.vin,
+            phoneNumber : vhInfo.phoneNumber
+        }
+        const updateResult = await Vehicle.findOneAndUpdate(findQuery, {locked: vhInfo.locked}, updateOptions);
+        if(updateResult !== null)
+            lockCb({
+                code: 200,
+                message: 'success to lock ' + vhInfo.locked
+            });
+
+        else
+            lockCb({
+                coee: 400,
+                message: 'can not lock the device'
+            });
+    } catch(err) {
+        logger.error(err);
+        lockCb({
+            code: 500,
+            message: 'SERVER ERROR'
+        });
+    }
 }
 
 exports.createUser = createUser;
@@ -427,3 +463,4 @@ exports.makeOtp = makeOtp;
 exports.otpCheck = otpCheck;
 exports.startPairing = startPairing;
 exports.checkPairing = checkPairing;
+exports.setVehicleLock = setVehicleLock;
