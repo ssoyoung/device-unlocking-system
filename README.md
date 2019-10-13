@@ -4,10 +4,10 @@ PoC code for device(vehicle) lock/unlock system
 - How to install & run
 
 
-   #1. Run docker compose build
+   #1. Run docker compose build (where docker-compose.yml file exists)
 >       $ docker-compose build
 
-   #2. Run docker compose up
+   #2. Run docker compose up (where docker-compose.yml file exists)
 >       $ docker-compose up
 
         ** caution
