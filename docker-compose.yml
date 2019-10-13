@@ -1,0 +1,54 @@
+version: "3"
+services:
+  mongo0:
+    hostname: mongo0
+    container_name: mongo0
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db/mongo0/data:/data/db
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongo1:
+    hostname: mongo1
+    container_name: mongo1
+    image: mongo
+    ports:
+      - 27018:27017
+    volumes:
+      - ./db/mongo1/data:/data/db
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongo2:
+    hostname: mongo2
+    container_name: mongo2
+    image: mongo
+    ports:
+      - 27019:27017
+    volumes:
+      - ./db/mongo2/data:/data/db
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  setup-rs:
+    image: "setup"
+    build: ./db/setup
+    depends_on:
+      - "mongo0"
+      - "mongo1"
+      - "mongo2"
+  
+  booking-server:
+    image: "unlocking"
+    container_name: "unlocking-server"
+    build: ./src
+    ports:
+      - 3000:3000
+    depends_on:
+      - "mongo0"
+      - "mongo1"
+      - "mongo2"
+      - "setup-rs"

@@ -9,7 +9,7 @@ var retryConnectCount = 0;
 function handleError()
 {
     //console.log("mongo db connection error handler");
-    if(retryConnectCount > 3) {
+    if(retryConnectCount > 10) {
         console.log("can not start server")
         console.log("- please restart server manually");
         process.exit(1);

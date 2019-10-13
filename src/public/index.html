@@ -51,8 +51,8 @@
         </div>
     <script>
     // client side javascript code
-    var url = 'http://localhost:3000';
-    // var url = 'http://unlocking-server:3000';
+    // var url = 'http://localhost:3000';
+    var url = 'http://unlocking-server:3000';
 
     var socket = io.connect(url);
     socket.on('new otp', (data) => {
