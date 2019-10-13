@@ -44,6 +44,9 @@ PoC code for device(scooter) lock/unlock system
                 : Click lock, unlock button
                 : if (3)'s user information or vehicles' information are entered wrong,
                   can not perform Lock/Unlock properly  (negative test)
+            (7) Reset
+                : You can use this function if user is in condition, excess 3 times wrong OTP entered problem
+                : enter the user information (phone number), and vehicle information if needed
 
    #4. etc
    
@@ -55,4 +58,4 @@ PoC code for device(scooter) lock/unlock system
 
 - to do list
     1. Pairing session timeout error functionality
-    2. Reset usability flag functionality
+    2. Code Refactoring & Stablization
