@@ -1,0 +1,16 @@
+var mongoose = require('mongoose');
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useUnifiedTopology', true );
+mongoose.set('useFindAndModify', true);
+
+const Schema = mongoose.Schema;
+const VehicleSechema = new Schema({
+    vin: String,
+    usability: Boolean,
+    phoneNumber: String,
+    paired: Boolean,
+    locked: Boolean,
+    pairCode: Number
+});
+
+module.exports = mongoose.model('Vehicles', VehicleSechema);
