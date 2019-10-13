@@ -38,6 +38,12 @@ PoC code for device(scooter) lock/unlock system
             (5) Enter Pairing Code
                 : Enter Pairing Code and click PAIRING button
                 : if pairing process is failed, you can not use lock/unlock function
+                : if (3)'s user information or vehicles' information are entered wrong,
+                  can not perform Pairing properly  (negative test)              
+            (6) Lock/Unlock
+                : Click lock, unlock button
+                : if (3)'s user information or vehicles' information are entered wrong,
+                  can not perform Lock/Unlock properly  (negative test)
 
    #4. etc
    
@@ -48,7 +54,5 @@ PoC code for device(scooter) lock/unlock system
 
 
 - to do list
-    1. Pairing code connection
+    1. Pairing session timeout error functionality
     2. Reset usability flag functionality
-    3. Lock/Unlock functionaility
-    4. Implement watch function in mongodb
