@@ -8,7 +8,6 @@ const Vehicle = require('./VehicleModel');
 var retryConnectCount = 0;
 function handleError()
 {
-    //console.log("mongo db connection error handler");
     if(retryConnectCount > 10) {
         console.log("can not start server")
         console.log("- please restart server manually");
@@ -41,7 +40,7 @@ function mongoConnect()
 
         console.log('success to connect mongo DB!');
 
-        // Create Collection (Ticket/UserAccount) if not exist in db
+        // Create Collection (Vehicle/UserAccount) if not exist in db
         initCollection();
 
         mongoose.connection.on('error', (e) => {
@@ -70,11 +69,12 @@ function mongoConnect()
 
 async function initCollection()
 {
-    // Ticket Collection
     try {
-        let findCb = await Vehicle.find({vin: "vehicle-1"});
-        if(findCb === null || findCb.length === 0) {
-            // make ticket collection
+        let findCb = await Vehicle.findOne({vin: "vehicle-1"});
+        if(findCb === null) {
+            logger.debug('make new vehicle document');
+
+            // make vehicle collection
             let vehicle = new Vehicle({
                 vin : "vehicle-1",
                 usability : true,
@@ -91,9 +91,10 @@ async function initCollection()
 
     // Account Collection
     try {
-        let findCb = await UserAccount.find({userId: "na"});
-        if(findCb === null || findCb.length === 0) {
-            // make ticket collection
+        let findCb = await UserAccount.findOne({phoneNumber: "na"});
+        if(findCb === null) {
+            logger.debug('make new user account document');
+
             let ua = new UserAccount({
                 phoneNumber :"na",
                 vins : [],

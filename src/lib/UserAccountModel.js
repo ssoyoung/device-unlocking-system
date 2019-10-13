@@ -5,7 +5,7 @@ mongoose.set('useFindAndModify', true);
 
 const Schema = mongoose.Schema;
 const UserAccountSchema = new Schema({
-    phoneNumber: {type: String, required : true},
+    phoneNumber: {type: String, required : true, unique: true},
     vins: [Object],
     otp: String,
     retry : Number
