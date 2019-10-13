@@ -26,13 +26,19 @@ io.on('connection', function(socket){
 
     });
 
-    socket.on('validation', function(data) {
+    socket.on('send otp', function(data) {
 
-        const otpData = data;
         // STEP 1: otp validation check (retry check & data validation check)
-
         // STEP 2: if passes, sends uccess message
-        socket.emit('otp success', 'enter paring code');
+        // socket.emit('otp success', 'enter paring code');
+
+        dbmanager.otpCheck(data, (checkCb) =>{
+            if(checkCb.code !== 200) {
+                socket.emit('no otp', checkCb.message);
+            } else {
+                socket.emit('otp success', checkCb.message);
+            }
+        });
     });
     
     // TODO : pairing code

@@ -39,9 +39,9 @@
                 <input id="otp-code" class="form-control" placeholder="Enter OTP">
                 </input>
                 <br>
-                <button id="paring" class="btn btn-success">SEND OTP</button>
+                <button id="send-otp" class="btn btn-success">SEND OTP</button>
 
-                <h3>5. Paring</h3> 
+                <h3>5. (###NOT IMPLEMENTED YET###) Paring</h3> 
                 <input id="paring-code" class="form-control" placeholder="paring code">
                 </input>
                 <br>
@@ -60,10 +60,14 @@
     });
 
     socket.on('no otp', (data) => {
-      // alert('ERROR : ' + data.message + '(code : ' + data.code + ')');
-      console.log(data);
-      alert('ERROR : ' + data);
+        // alert('ERROR : ' + data.message + '(code : ' + data.code + ')');
+        console.log(data);
+        alert('ERROR : ' + data);
     });
+
+    socket.on('otp success', (data) => {
+        alert(data);
+    })
 
     $(function () {
         $("#user-create").click(()=>{
@@ -116,6 +120,16 @@
         });
     });
 
+    $(function () {
+        $("#send-otp").click(()=>{
+          const data = {
+                phoneNumber : $("#otp-phone-number").val(),
+                vin : $("#otp-vehicle-id").val(),
+                otp : $("#otp-code").val()
+            };
+            socket.emit('send otp', data);
+        });
+    });
 
     </script>
 

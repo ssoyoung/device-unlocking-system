@@ -198,7 +198,7 @@ async function generateCode()
     return new Promise((resolve, reject) => {
         // Declare a digits variable  
         // which stores all digits 
-        var digits = '0123456789'; 
+        var digits = '123456789'; 
         let code = ''; 
         for (let i = 0; i < 4; i++ ) { 
             code += digits[Math.floor(Math.random() * 10)]; 
@@ -207,6 +207,75 @@ async function generateCode()
     });
 }
 
+async function otpCheck(info, checkCb)
+{
+    const phoneNumber = info.phoneNumber;
+    const vin = info.vin;
+    const otp = info.otp;
+
+    try {
+        const userCondition = {
+            phoneNumber : phoneNumber
+        };
+
+        let userFound = await UserAccount.findOne(userCondition);
+        if(userFound === null) {
+            checkCb({
+                code: 404,
+                message: 'no such user exist'
+            });
+            return;
+        }
+
+        if(userFound.retry >= 3) {
+            checkCb({
+                code: 401,
+                message: 'otp excess, please contact agent'
+            });
+            return;
+        }
+
+        let updateUser;
+        if(userFound.otp == otp) {
+            // update retry : set to 0
+            updateUser = {
+                retry : 0
+            };
+            await UserAccount.findOneAndUpdate(userCondition, updateUser, updateOptions);
+
+            checkCb({
+                code: 200,
+                message: 'otp matched!'
+            });
+
+            // **********************************
+            // TODO : SEND PAIR CODE TO VEHICLE
+            return;
+        } else {
+
+            // update retry
+            updateUser = {
+                retry:  userFound.retry + 1
+            };
+            await UserAccount.findOneAndUpdate(userCondition, updateUser, updateOptions);
+
+            checkCb({
+                code: 401,
+                message: 'otp code is wrong'
+            });
+            return;
+        }
+    } catch(err) {
+        checkCb({
+            code: 500,
+            message: err
+        });
+    }
+}
+
+// transaction
+
 exports.createUser = createUser;
 exports.createVehicle = createVehicle;
 exports.makeOtp = makeOtp;
+exports.otpCheck = otpCheck;
