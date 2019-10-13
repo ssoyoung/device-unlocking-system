@@ -9,21 +9,24 @@ io.on('connection', function(socket){
     
     console.log('connected');
 
-    socket.on('validation', function (data) {
-        const email = data.email;
+    socket.on('get otp', function (data) {
+        const phoneNumber = data.phoneNumber;
         const vin = data.vin;
 
-        // TODO : validation check
-        // STEP 1: user & vehicle validty check
+        dbmanager.makeOtp(phoneNumber, vin, (makeCb) => {
+            console.log('makeCb is called');
 
-        // STEP 2: if passes, make & save otp
-        //const otpData;
+            if(makeCb.code !== 200) {
+                socket.emit('otp error : ', makeCb.message);
+            } else {
+                const otpData = makeCb.message;
+                socket.emit('new otp', otpData);    
+            }
+        });
 
-        // STEP 3: send otp to client
-        socket.emit('new otp', otpData);
     });
 
-    socket.on('otp', function(data) {
+    socket.on('validation', function(data) {
 
         const otpData = data;
         // STEP 1: otp validation check (retry check & data validation check)

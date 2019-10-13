@@ -8,6 +8,14 @@ const Vehicle = require('./VehicleModel');
 
 mongodb.mongoConnect();
 
+const updateOptions = {
+    new: true,  // check schema validation
+    runValidators : true,    // print out updated document
+    useFindAndModify: false
+};
+/*
+ * function for create user
+ */
 async function createUser(userInfo, createCb)
 {
     try {
@@ -29,7 +37,8 @@ async function createUser(userInfo, createCb)
         let ua = new UserAccount({
             phoneNumber: phoneNumber,
             vins: [],
-            otp: {}
+            otp: 0,
+            retry: 0
         });
 
         await ua.save();
@@ -49,6 +58,9 @@ async function createUser(userInfo, createCb)
 
 }
 
+/*
+ * function for create vehicle
+ */
 async function createVehicle(vehicleInfo, createCb)
 {
     try {
@@ -92,7 +104,93 @@ async function createVehicle(vehicleInfo, createCb)
             message: 'internal server error'
         });
     }
+}
 
+/*
+ * function for make OTP
+ */
+async function makeOtp(phoneNumber, vin, makeCb)
+{
+    try {
+        const vhCondition = {
+            vin: vin
+        };
+        let vhFound = await Vehicle.findOne(vhCondition);
+        console.log('#####');
+        console.log(vhFound);
+
+        // error handling
+        if(vhFound === null) {
+            makeCb({
+                code : 404,
+                message: 'no such vehicle exist'
+            });
+            return;
+        }
+        if(vhFound.usability === false) {
+            makeCb({
+                code : 400,
+                message: 'can not use that vehicle, please contact agent'
+            });
+            return;
+
+        }
+        if(vhFound.paired === true) {
+            makeCb({
+                code: 400,
+                message: 'already paired'
+            });
+            return;
+        }
+
+        const userCondition = {
+            phoneNumber: phoneNumber
+        }
+        let userFound = await UserAccount.findOne(userCondition);
+        if(userFound === null) {
+            makeCb({
+                code: 404,
+                message: 'no such user exist'
+            });
+            return;
+        }
+        if(userFound.retry >= 3) {
+            makeCb({
+                code: 401,
+                message: 'retry OTP exceed. please contact customer agent'
+            });
+            return;
+        }
+        
+        const otpCode = await generateCode();
+
+        // save to user db
+        const updateCondition = {
+            phoneNumber: phoneNumber
+        };
+
+        const updateUser = {
+            retry: userFound.retry + 1,
+            otp : otpCode
+        };
+
+        await UserAccount.findOneAndUpdate(updateCondition, updateUser, updateOptions); 
+
+        makeCb({
+            code: 200,
+            message: otpCode
+        });
+
+        return;
+
+    } catch(err) {
+        console.log(err);
+        makeCb({
+            code: 500,
+            message: 'internal server error'
+        });
+        return;
+    }    
 }
 
 async function generateCode()
@@ -108,5 +206,7 @@ async function generateCode()
         resolve(code);
     });
 }
+
 exports.createUser = createUser;
 exports.createVehicle = createVehicle;
+exports.makeOtp = makeOtp;

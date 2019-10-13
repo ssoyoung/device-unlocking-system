@@ -97,7 +97,8 @@ async function initCollection()
             let ua = new UserAccount({
                 userId :"na",
                 vins : [],
-                otp: {}
+                otp: 0000,
+                retry: 0
             });
             await ua.save();
         }

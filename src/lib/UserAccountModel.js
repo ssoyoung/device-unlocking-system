@@ -5,7 +5,7 @@ mongoose.set('useFindAndModify', true);
 
 const Schema = mongoose.Schema;
 const UserAccountSchema = new Schema({
-    phoneNumber: String, vins: [Object], otp: Object
+    phoneNumber: String, vins: [Object], otp: Number, retry : Number
 });
 
 module.exports = mongoose.model('UserAccounts', UserAccountSchema);
