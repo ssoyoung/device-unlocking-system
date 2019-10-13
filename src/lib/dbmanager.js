@@ -19,6 +19,12 @@ const updateOptions = {
 async function createUser(userInfo, createCb)
 {
     try {
+        if(userInfo === null || userInfo.phoneNumber === null || userInfo.phoneNumber.length === 0) {
+            createCb({
+                code: 400,
+                message: 'empty info entered'
+            });
+        }
         const phoneNumber = userInfo.phoneNumber;
         const condition = {
             phoneNumber: phoneNumber
@@ -116,8 +122,8 @@ async function makeOtp(phoneNumber, vin, makeCb)
             vin: vin
         };
         let vhFound = await Vehicle.findOne(vhCondition);
-        console.log('#####');
-        console.log(vhFound);
+        // logger.log('#####');
+        // logger.log(vhFound);
 
         // error handling
         if(vhFound === null) {
@@ -323,6 +329,95 @@ async function startPairing(vin, paringCb)
             message : 'SERVER ERROR'
         })
     }
+}
+
+async function checkPairing(pairingData, pairingCb) {
+    const phoneNumber = pairingData.phoneNumber;
+    const vin = pairingData.vin;
+    const pairCode = pairingData.pairCode;
+    
+    // mongo transaction session
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    const opts = { session };
+    
+    try {
+
+        const vhCondition = {
+            vin: vin,
+            usability: true,
+            paired: false,
+            pairCode: pairCode
+        };
+        let vhFound = await Vehicle.findOne(vhCondition);
+        if(vhFound === null) {
+            logger.error('wrong info');
+            await session.commitTransaction();
+            session.endSession();    
+            pairingCb({
+                code: 404,
+                message: 'wrong pairing information'
+            });
+            return;    
+        }
+
+
+        const userCondition  = {
+            phoneNumber : phoneNumber,
+            vins: {$ne: vin}
+        };
+        let foundUser = UserAccount.findOne(userCondition);
+        if(foundUser === null) {
+            await session.commitTransaction();
+            session.endSession();    
+            pairingCb({
+                code: 400,
+                message: 'wrong user info OR already registered Vehicle'
+            });
+            return;    
+        }
+
+        // set vins : vin
+        const vinInfoUser = {
+            vin : vin,
+            history : []
+        };
+        let updateData = {
+            vins: vinInfoUser
+        };
+        await UserAccount.updateOne(userCondition, {$push: updateData}, updateOptions);
+
+        // set retry 0
+        // set otp ""
+        updateData = {
+            retry: 0,
+            otp : ""
+        }
+        await UserAccount.updateOne(userCondition, updateData, updateOptions);
+   
+        
+        // Update Vehicle Document
+        // set paired : true, phoneNumber: phoneNumber
+        await Vehicle.updateOne(vhCondition, {paired: true, phoneNumber: phoneNumber});
+
+        await session.commitTransaction();
+        session.endSession();    
+        pairingCb({
+            code: 200,
+            message: 'success to pairing with device!'
+        });
+        return;
+    } catch(err) {
+        logger.error(err);
+
+        await session.abortTransaction();
+        session.endSession();
+
+        pairingCb({
+            code: 500,
+            message: 'SERVER ERROR'
+        });
+    }
 
 }
 
@@ -331,3 +426,4 @@ exports.createVehicle = createVehicle;
 exports.makeOtp = makeOtp;
 exports.otpCheck = otpCheck;
 exports.startPairing = startPairing;
+exports.checkPairing = checkPairing;

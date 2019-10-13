@@ -41,11 +41,11 @@
                 <br>
                 <button id="send-otp" class="btn btn-success">SEND OTP</button>
 
-                <h3>5. (###NOT IMPLEMENTED YET###) Pairing</h3> 
-                <input id="paring-code" class="form-control" placeholder="paring code">
+                <h3>5. Pairing</h3> 
+                <input id="pair-code" class="form-control" placeholder="paring code">
                 </input>
                 <br>
-                <button id="paring" class="btn btn-success">PAIRING</button>
+                <button id="send-pairing" class="btn btn-success">PAIRING</button>
             </div>
 
         </div>
@@ -69,11 +69,15 @@
         alert(data);
     });
 
-    socket.on('pairing error', (data) => {
+    socket.on('pair err', (data) => {
         console.log(data);
-    })
+        alert(data);
+    });
     socket.on('pairing code', (data) => {
         alert('VEHICLE DISPLAY (PAIRING CODE) : ' + data);
+    });
+    socket.on('pair success', (data) => {
+        alert(data);
     });
 
     $(function () {
@@ -135,6 +139,17 @@
                 otp : $("#otp-code").val()
             };
             socket.emit('send otp', data);
+        });
+    });
+
+    $(function () {
+        $("#send-pairing").click(()=>{
+          const data = {
+                phoneNumber : $("#otp-phone-number").val(),
+                vin : $("#otp-vehicle-id").val(),
+                pairCode : $("#pair-code").val()
+            };
+            socket.emit('send pairing', data);
         });
     });
 

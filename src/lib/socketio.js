@@ -51,9 +51,21 @@ io.on('connection', function(socket){
             }
         });
     });
+
+
+    socket.on('send pairing', (data) => {
+        dbmanager.checkPairing(data, (pairingCb) => {
+            console.log('pairing CB is called');
+            console.log(pairingCb.code);
+            console.log(pairingCb.message);
+            if(pairingCb.code !== 200) {
+                socket.emit('pair err', pairingCb.message);
+            } else {
+                socket.emit('pair success', pairingCb.message);
+            }
+        });
+    });
     
-    // TODO : pairing code
-     
 });
 
 io.on('dissconnection', function(socket){
