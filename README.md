@@ -33,6 +33,11 @@ PoC code for device(scooter) lock/unlock system
                 : Get OTP Code for user (maximum 3 times)
             (4) Enter OTP
                 : OTP validty check (maximum 3 times)
+                : if OTP validty check is done successfully, alert message pops up
+                  (Assume that, that is a pairing code which is shown in device's screen)
+            (5) Enter Pairing Code
+                : Enter Pairing Code and click PAIRING button
+                : if pairing process is failed, you can not use lock/unlock function
 
    #4. etc
    
