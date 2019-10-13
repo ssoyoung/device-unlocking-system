@@ -198,7 +198,7 @@ async function generateCode()
     return new Promise((resolve, reject) => {
         // Declare a digits variable  
         // which stores all digits 
-        var digits = '123456789'; 
+        var digits = '0123456789'; 
         let code = ''; 
         for (let i = 0; i < 4; i++ ) { 
             code += digits[Math.floor(Math.random() * 10)]; 

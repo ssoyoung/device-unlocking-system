@@ -10,7 +10,7 @@ const VehicleSechema = new Schema({
     phoneNumber: String,
     paired: Boolean,
     locked: Boolean,
-    pairCode: Number
+    pairCode: String
 });
 
 module.exports = mongoose.model('Vehicles', VehicleSechema);
