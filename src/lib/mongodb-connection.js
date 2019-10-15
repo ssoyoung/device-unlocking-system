@@ -9,12 +9,12 @@ var retryConnectCount = 0;
 function handleError()
 {
     if(retryConnectCount > 10) {
-        console.log('can not start server');
-        console.log('- please restart server manually');
+        logger.error('can not start server');
+        logger.error('- please restart server manually');
         process.exit(1);
     }
 
-    console.log('Mongo DB connection retry...');
+    logger.info('Mongo DB connection retry...');
     setTimeout(() => {
         retryConnectCount++;
         mongoConnect();
@@ -38,7 +38,7 @@ function mongoConnect()
 
     mongoose.connect(mongoDbUrl, connectOption).then((result) => {
 
-        console.log('success to connect mongo DB!');
+        logger.info('success to connect mongo DB!');
         logger.debug(result);
         // Create Collection (Vehicle/UserAccount) if not exist in db
         initCollection();
@@ -60,8 +60,8 @@ function mongoConnect()
         });
 
     }).catch((err) => {
-        console.log('fail to connect mongo DB');
-        console.log(err);
+        logger.error('fail to connect mongo DB');
+        logger.error(err);
         handleError();
     });
 
@@ -81,12 +81,12 @@ async function initCollection()
                 phoneNumber : null,
                 paired : false,
                 locked : true,
-                pairCode : 1234
+                pairCode : '1234'
             });
             await vehicle.save();
         }
     } catch(err) {
-        console.log(err);
+        logger.error(err);
     }
 
     // Account Collection
@@ -98,13 +98,13 @@ async function initCollection()
             let ua = new UserAccount({
                 phoneNumber : 'na',
                 vins : [],
-                otp: 0,
+                otp: '0000',
                 retry: 0
             });
             await ua.save();
         }
     } catch(err) {
-        console.log(err);
+        logger.error(err);
     }
 
 }

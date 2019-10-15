@@ -32,7 +32,7 @@ async function createUser(userInfo, createCb)
         };
 
         let found = await UserAccount.find(condition);
-        console.log(found.length);
+        logger.debug(found.length);
         if(found.length !== 0) {
             createCb({
                 code : 409,
@@ -56,7 +56,7 @@ async function createUser(userInfo, createCb)
         return;
 
     } catch(err) {
-        console.log(err);
+        logger.error(err);
         createCb({
             code: 500,
             message: 'internal server error'
@@ -77,7 +77,7 @@ async function createVehicle(vehicleInfo, createCb)
         };
 
         let found = await Vehicle.find(condition);
-        console.log(found.length);
+        logger.debug(found.length);
         if(found.length !== 0) {
             createCb({
                 code : 409,
@@ -105,7 +105,7 @@ async function createVehicle(vehicleInfo, createCb)
         return;
 
     } catch(err) {
-        console.log(err);
+        logger.error(err);
         createCb({
             code: 500,
             message: 'internal server error'
@@ -191,7 +191,7 @@ async function makeOtp(phoneNumber, vin, makeCb)
         return;
 
     } catch(err) {
-        console.log(err);
+        logger.error(err);
         makeCb({
             code: 500,
             message: 'internal server error'
@@ -209,7 +209,11 @@ async function generateCode()
         let code = ''; 
         for (let i = 0; i < 4; i++ ) { 
             code += digits[Math.floor(Math.random() * 10)]; 
-        } 
+        }
+
+        if(isNaN(code)) {
+            code = code.toString();
+        }
         resolve(code);
     });
 }
