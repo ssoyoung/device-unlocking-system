@@ -57,7 +57,7 @@ io.on('connection', function(socket){
     socket.on('send pairing', (data) => {
         dbmanager.checkPairing(data, (pairingCb) => {
             if(pairingCb.code !== 200) {
-                socket.emit('pair err', pairingCb.message + '(' + pairingCb.code + ')');
+                socket.emit('pairing error', pairingCb.message + '(' + pairingCb.code + ')');
             } else {
                 socket.emit('pair success', pairingCb.message);
             }

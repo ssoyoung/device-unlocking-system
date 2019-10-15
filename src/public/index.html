@@ -82,16 +82,17 @@
         alert(data);
     });
 
-    socket.on('pair err', (data) => {
-        console.log(data);
-        alert(data);
-    });
     socket.on('pairing code', (data) => {
         alert('VEHICLE DISPLAY (PAIRING CODE) : ' + data);
     });
     socket.on('pair success', (data) => {
         alert(data);
     });
+    socket.on('pairing err', (data) => {
+        console.log(data);
+        alert(data);
+    });
+
     socket.on('locked', (data) => {
         alert(data);
     });
