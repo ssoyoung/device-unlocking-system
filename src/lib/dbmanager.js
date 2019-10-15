@@ -177,7 +177,6 @@ async function makeOtp(phoneNumber, vin, makeCb)
         };
 
         const updateUser = {
-            retry: userFound.retry + 1,
             otp : otpCode
         };
 
@@ -200,6 +199,9 @@ async function makeOtp(phoneNumber, vin, makeCb)
     }    
 }
 
+/*
+ * function for making OTP & PAIRING code
+ */
 async function generateCode()
 {
     return new Promise((resolve, reject) => {
@@ -211,6 +213,7 @@ async function generateCode()
             code += digits[Math.floor(Math.random() * 10)]; 
         }
 
+        // if code is number, change to string
         if(isNaN(code)) {
             code = code.toString();
         }
@@ -218,6 +221,9 @@ async function generateCode()
     });
 }
 
+/*
+ * function for OTP checker
+ */
 async function otpCheck(info, checkCb)
 {
     const phoneNumber = info.phoneNumber;
@@ -295,6 +301,10 @@ async function otpCheck(info, checkCb)
     }
 }
 
+/*
+ * function for making & sending pairing code
+ * (by compairing paring code)
+*/
 async function startPairing(vin, paringCb)
 {
     // Generating pairing number
@@ -336,6 +346,9 @@ async function startPairing(vin, paringCb)
     }
 }
 
+/*
+ * function for checking pairing code equals or not
+ */
 async function checkPairing(pairingData, pairingCb) {
     const phoneNumber = pairingData.phoneNumber;
     const vin = pairingData.vin;
@@ -424,6 +437,9 @@ async function checkPairing(pairingData, pairingCb) {
     }
 }
 
+/*
+ * function for setting device lock/unlock
+ */
 async function setVehicleLock(vhInfo, lockCb)
 {
     try {
@@ -461,6 +477,9 @@ async function setVehicleLock(vhInfo, lockCb)
     }
 }
 
+/*
+ * function for reset all pairing process
+ */
 async function resetProcess(resetInfo, resetCb)
 {
     const session = await mongoose.startSession();
