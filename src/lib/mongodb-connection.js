@@ -1,4 +1,4 @@
-var mongoose = require('mongoose')
+var mongoose = require('mongoose');
 var tracer = require('tracer');
 const logger = tracer.colorConsole();
 
@@ -9,12 +9,12 @@ var retryConnectCount = 0;
 function handleError()
 {
     if(retryConnectCount > 10) {
-        console.log("can not start server")
-        console.log("- please restart server manually");
+        console.log('can not start server');
+        console.log('- please restart server manually');
         process.exit(1);
     }
 
-    console.log("Mongo DB connection retry...");
+    console.log('Mongo DB connection retry...');
     setTimeout(() => {
         retryConnectCount++;
         mongoConnect();
@@ -31,15 +31,15 @@ function mongoConnect()
 {
     const mongoDbUrl = 'mongodb://mongo0:27017,mongo1:27018,mongo2:27019/unlockingsystem';
     const connectOption ={
-                    replicaSet: 'rs0', 
-                    reconnectTries: 60,
-                    reconnectInterval:2000
+        replicaSet: 'rs0', 
+        reconnectTries: 60,
+        reconnectInterval:2000
     };
 
     mongoose.connect(mongoDbUrl, connectOption).then((result) => {
 
         console.log('success to connect mongo DB!');
-
+        logger.debug(result);
         // Create Collection (Vehicle/UserAccount) if not exist in db
         initCollection();
 
@@ -70,13 +70,13 @@ function mongoConnect()
 async function initCollection()
 {
     try {
-        let findCb = await Vehicle.findOne({vin: "vehicle-1"});
+        let findCb = await Vehicle.findOne({vin: 'vehicle-1'});
         if(findCb === null) {
             logger.debug('make new vehicle document');
 
             // make vehicle collection
             let vehicle = new Vehicle({
-                vin : "vehicle-1",
+                vin : 'vehicle-1',
                 usability : true,
                 phoneNumber : null,
                 paired : false,
@@ -91,14 +91,14 @@ async function initCollection()
 
     // Account Collection
     try {
-        let findCb = await UserAccount.findOne({phoneNumber: "na"});
+        let findCb = await UserAccount.findOne({phoneNumber: 'na'});
         if(findCb === null) {
             logger.debug('make new user account document');
 
             let ua = new UserAccount({
-                phoneNumber :"na",
+                phoneNumber : 'na',
                 vins : [],
-                otp: 0000,
+                otp: 0,
                 retry: 0
             });
             await ua.save();
