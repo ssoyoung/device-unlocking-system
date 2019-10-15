@@ -1,6 +1,6 @@
 var tracer = require('tracer');
 var mongodb = require('./mongodb-connection');
-var mongoose = require('mongoose')
+var mongoose = require('mongoose');
 const logger = tracer.colorConsole();
 
 const UserAccount= require('./UserAccountModel');
@@ -13,6 +13,7 @@ const updateOptions = {
     runValidators : true,    // print out updated document
     useFindAndModify: false
 };
+
 /*
  * function for create user
  */
@@ -151,7 +152,7 @@ async function makeOtp(phoneNumber, vin, makeCb)
 
         const userCondition = {
             phoneNumber: phoneNumber
-        }
+        };
         let userFound = await UserAccount.findOne(userCondition);
         if(userFound === null) {
             makeCb({
@@ -216,13 +217,13 @@ async function generateCode()
 async function otpCheck(info, checkCb)
 {
     const phoneNumber = info.phoneNumber;
-    const vin = info.vin;
+    // const vin = info.vin;
     const otp = info.otp;
 
     // mongo transaction session
     const session = await mongoose.startSession();
     session.startTransaction();
-    const opts = { session };
+    // const opts = { session };
     
     try {
         const userCondition = {
@@ -327,7 +328,7 @@ async function startPairing(vin, paringCb)
         paringCb({
             code : 500,
             message : 'SERVER ERROR'
-        })
+        });
     }
 }
 
@@ -339,7 +340,6 @@ async function checkPairing(pairingData, pairingCb) {
     // mongo transaction session
     const session = await mongoose.startSession();
     session.startTransaction();
-    const opts = { session };
     
     try {
 
@@ -388,11 +388,11 @@ async function checkPairing(pairingData, pairingCb) {
         await UserAccount.updateOne(userCondition, {$push: updateData}, updateOptions);
 
         // set retry 0
-        // set otp ""
+        // set otp ''
         updateData = {
             retry: 0,
-            otp : ""
-        }
+            otp : ''
+        };
         await UserAccount.updateOne(userCondition, updateData, updateOptions);
    
         
@@ -427,7 +427,7 @@ async function setVehicleLock(vhInfo, lockCb)
         if(foundOne === null) {
             lockCb({
                 code: 400,
-                message: "no such vehicle exist"
+                message: 'no such vehicle exist'
             });
             return;
         }
@@ -435,7 +435,7 @@ async function setVehicleLock(vhInfo, lockCb)
         const findQuery = {
             vin : vhInfo.vin,
             phoneNumber : vhInfo.phoneNumber
-        }
+        };
         const updateResult = await Vehicle.findOneAndUpdate(findQuery, {locked: vhInfo.locked}, updateOptions);
         if(updateResult !== null)
             lockCb({
@@ -502,7 +502,7 @@ async function resetProcess(resetInfo, resetCb)
             usability: true,
             paired: false,
             phoneNumber: ''
-        }
+        };
         await Vehicle.updateOne(vhCondition, vhUpdate, updateOptions);
         await session.commitTransaction();
         session.endSession();    
