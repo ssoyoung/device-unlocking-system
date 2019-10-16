@@ -3,11 +3,12 @@ PoC code for device(vehicle) lock/unlock system
 
 - How to install & run
 
-
-   #1. Run docker compose build (where docker-compose.yml file exists)
+   
+   
+STEP 1. Run docker compose build (where docker-compose.yml file exists)
 >       $ docker-compose build
 
-   #2. Run docker compose up (where docker-compose.yml file exists)
+   STEP 2. Run docker compose up (where docker-compose.yml file exists)
 >       $ docker-compose up
 
         ** caution
@@ -18,7 +19,7 @@ PoC code for device(vehicle) lock/unlock system
             
             unlocking-server  | success to connect mongo DB!
 
-   #3. Go to client website for test
+   STEP 3. Go to client website for test
         
         - Enter http://localhost:3000 in browser
         
@@ -49,7 +50,9 @@ PoC code for device(vehicle) lock/unlock system
                 : Enter Pairing Code and click PAIRING button
                 : if pairing process is failed, you can not use lock/unlock function
                 : if (3)'s user information or vehicles' information are entered wrong,
-                  can not perform Pairing properly  (negative test)    
+                  can not perform Pairing properly  (negative test)
+                : Pairing code is valid during 2 minutes
+                  (if 2 minutes passed, user can not access to the system, and reset(7) is needed)
                   
             (6) Lock/Unlock
                 : Click lock, unlock button
@@ -60,7 +63,7 @@ PoC code for device(vehicle) lock/unlock system
                 : You can use this function if user is in condition, excess 3 times wrong OTP entered problem
                 : Enter the user information (phone number), and vehicle information if needed
 
-   #4. etc
+   etc.
    
    
         - if you want to volume option for persistent storage,
@@ -69,7 +72,6 @@ PoC code for device(vehicle) lock/unlock system
 
 
 - to do list
-    1. Pairing session timeout error functionality
-    2. Code Refactoring & Stablization
-    3. Unit test code (Behavioral Driven Testing)
-    4. Phone number validation check
+    1. Code Refactoring & Stablization
+    2. Unit test code (Behavioral Driven Testing)
+    3. Phone number validation check
