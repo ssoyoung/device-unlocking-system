@@ -91,6 +91,7 @@ async function createVehicle(vehicleInfo, createCb)
 
         let ua = new Vehicle({
             vin : vin,
+            usability: true,
             phoneNumber: null,
             paired: false,
             locked: true,
@@ -134,10 +135,10 @@ async function makeOtp(phoneNumber, vin, makeCb)
             });
             return;
         }
-        if(vhFound.paired === true) {
+        if(vhFound.usability === false) {
             makeCb({
                 code : 400,
-                message: 'vehicle is already paired, please contact user agent'
+                message: 'can not use that vehicle, please contact agent'
             });
             return;
 
@@ -310,7 +311,8 @@ async function startPairing(vin, pairingCb)
     // Generating pairing number
     const findCondition = {
         vin: vin,
-        paired: false
+        paired: false,
+        usability: true
     };
 
     const pairCode = await generateCode();
@@ -377,6 +379,7 @@ async function checkPairing(pairingData, pairingCb) {
 
         const vhCondition = {
             vin: vin,
+            usability: true,
             paired: false,
             pairCode: pairCode
         };
@@ -544,6 +547,7 @@ async function resetProcess(resetInfo, resetCb)
         }
         
         const vhUpdate = {
+            usability: true,
             paired: false,
             phoneNumber: ''
         };

@@ -77,6 +77,7 @@ async function initCollection()
             // make vehicle collection
             let vehicle = new Vehicle({
                 vin : 'vehicle-1',
+                usability : true,
                 phoneNumber : null,
                 paired : false,
                 locked : true,
