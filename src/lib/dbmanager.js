@@ -14,6 +14,7 @@ const updateOptions = {
     useFindAndModify: false
 };
 
+var timerMap = new Map();
 /*
  * function for create user
  */
@@ -304,7 +305,7 @@ async function otpCheck(info, checkCb)
  * function for making & sending pairing code
  * (by compairing paring code)
 */
-async function startPairing(vin, paringCb)
+async function startPairing(vin, pairingCb)
 {
     // Generating pairing number
     const findCondition = {
@@ -321,7 +322,7 @@ async function startPairing(vin, paringCb)
     try {
         const found = await Vehicle.findOne(findCondition);
         if(found === null) {
-            paringCb({
+            pairingCb({
                 code: 404,
                 message: 'invalid vehicle selected'
             });
@@ -329,15 +330,31 @@ async function startPairing(vin, paringCb)
         }
         
         await Vehicle.findOneAndUpdate(findCondition, updateData, updateOptions);
-        paringCb({
+        pairingCb({
             code: 200,
             message: pairCode
         });
+
+        // set time out during 2 min
+        const timerId = setTimeout(() => {
+
+            // TODO : Set Usability Field false
+
+            pairingCb({
+                code: 400,
+                message: 'time exceed to enter pairing code'
+            });
+        }, 120000);
+        // update timer map
+        timerMap.set({
+            vin : timerId
+        });
+
         return;
     } catch(err) {
         logger.error('vehicle pairing code update error');
         logger.error(err);
-        paringCb({
+        pairingCb({
             code : 500,
             message : 'SERVER ERROR'
         });
@@ -415,7 +432,15 @@ async function checkPairing(pairingData, pairingCb) {
         await Vehicle.updateOne(vhCondition, {paired: true, phoneNumber: phoneNumber});
 
         await session.commitTransaction();
-        session.endSession();    
+        session.endSession();
+
+        // cancel timer
+        if(timerMap.has(vin)) {
+            const timerId = timerMap.get(vin);
+            clearTimeout(timerId);
+            timerMap.delete(vin);
+        }
+        
         pairingCb({
             code: 200,
             message: 'success to pairing with device!'

@@ -9,7 +9,7 @@ var dbmanager = require('./dbmanager');
 
 io.on('connection', function(socket){
     
-    console.log('connected');
+    logger.info('connected');
 
     socket.on('get otp', function (data) {
         const phoneNumber = data.phoneNumber;
@@ -73,7 +73,7 @@ io.on('connection', function(socket){
 });
 
 io.on('dissconnection', function(socket){
-    logger.log('disconnected ' + socket.id);
+    logger.info('disconnected ' + socket.id);
 });
  
 module.exports = socketio;
