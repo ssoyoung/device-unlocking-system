@@ -39,7 +39,8 @@ function mongoConnect()
     mongoose.connect(mongoDbUrl, connectOption).then((result) => {
 
         logger.info('success to connect mongo DB!');
-        logger.debug(result);
+        if(result === null)
+            logger.debug('no info in mongoDB');
         // Create Collection (Vehicle/UserAccount) if not exist in db
         initCollection();
 

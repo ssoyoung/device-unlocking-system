@@ -304,7 +304,7 @@ async function otpCheck(info, checkCb)
 
 /*
  * function for making & sending pairing code
- * (by compairing paring code)
+ * (by compairing pairing code)
 */
 async function startPairing(vin, pairingCb)
 {
@@ -340,18 +340,44 @@ async function startPairing(vin, pairingCb)
         // set time out during 2 min
         const timerId = setTimeout(() => {
 
-            // TODO : Set Usability Field false
+            const updateCondition = {
+                vin: vin
+            };
+            const updateData = {
+                usability: false
+            };
 
-            pairingCb({
-                code: 400,
-                message: 'time exceed to enter pairing code'
-            });
+            Vehicle.findOneAndUpdate(updateCondition, updateData, updateOptions)
+                .then((updated) => {
+
+                    timerMap.delete(vin);
+
+                    if(updated === null) {
+                        pairingCb({
+                            code: 400,
+                            message: 'there is no such device to be paired'
+                        });
+                    }
+                    else {
+                        pairingCb({
+                            code: 400,
+                            message: 'time exceed to enter pairing code'
+                        });
+                    }
+    
+                }).catch((updateErr) => {
+
+                    logger.error(updateErr);
+                    pairingCb({
+                        code: 500,
+                        message: 'INTERNAL SERVER ERROR'
+                    });
+        
+                });
         }, 120000);
-        // update timer map
-        timerMap.set({
-            vin : timerId
-        });
 
+        // update timer map
+        timerMap.set(vin, timerId);
         return;
     } catch(err) {
         logger.error('vehicle pairing code update error');
@@ -370,13 +396,12 @@ async function checkPairing(pairingData, pairingCb) {
     const phoneNumber = pairingData.phoneNumber;
     const vin = pairingData.vin;
     const pairCode = pairingData.pairCode;
-    
+
     // mongo transaction session
     const session = await mongoose.startSession();
     session.startTransaction();
     
     try {
-
         const vhCondition = {
             vin: vin,
             usability: true,
@@ -433,7 +458,6 @@ async function checkPairing(pairingData, pairingCb) {
         // Update Vehicle Document
         // set paired : true, phoneNumber: phoneNumber
         await Vehicle.updateOne(vhCondition, {paired: true, phoneNumber: phoneNumber});
-
         await session.commitTransaction();
         session.endSession();
 
@@ -443,7 +467,9 @@ async function checkPairing(pairingData, pairingCb) {
             clearTimeout(timerId);
             timerMap.delete(vin);
         }
-        
+        else {
+            logger.error('timerMap has no such ID ', vin);
+        }
         pairingCb({
             code: 200,
             message: 'success to pairing with device!'
