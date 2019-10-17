@@ -1,5 +1,16 @@
 # device-unlocking-system
-PoC code for device(vehicle) lock/unlock system
+- What is this project about?
+
+   : Device(vehicle) lock/unlock system. It includes below functionalities...
+
+   :  Create User with phone number / Create Vehicle Device with unique ID /
+      Get OTP from server / OTP matching checker /
+      Get Pairing Code from server (automatically performed after OTP matching checker is done) / Send Pairing Code to server / Device lock, unlock
+
+- Which skills are used?
+
+   REST API call, socket.io, mongo DB (+mongoose), docker
+
 
 - How to install & run
 
@@ -70,8 +81,14 @@ STEP 1. Run docker compose build (where docker-compose.yml file exists)
            comment out volume in docker-compose.yml file
 
 
+   Q. I am a developer. How to use the APIs for this system?
+
+   A. Reference code is in index.html file.
+      But I will write about it with much more details as soon as possible.
+
 
 - to do list
     1. Code Refactoring & Stablization
     2. Unit test code (Behavioral Driven Testing)
     3. Phone number validation check
+    4. API Doxygen
