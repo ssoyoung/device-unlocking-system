@@ -97,7 +97,7 @@ async function initCollection()
             logger.debug('make new user account document');
 
             let ua = new UserAccount({
-                phoneNumber : 'na',
+                phoneNumber : '000-0000-0000',
                 vins : [],
                 otp: '0000',
                 retry: 0

@@ -12,7 +12,7 @@
                
                 <h3>1. User Account Creation</h3>
                 <div class="input-group">
-                    <input class="form-control" width="100" id="user-id" placeholder="phone number">
+                    <input class="form-control" type='tel' width="100" id="user-id" placeholder="phone number" required>
                     <span class="input-group-btn">
                         <button id="user-create" class="btn btn-success">CREATE</button>
                     </span>
@@ -28,7 +28,7 @@
                 </div>
 
                 <h3>3. Get OTP </h3>
-                <input id="otp-phone-number" class="form-control" placeholder="phone number">
+                <input type='tel' id="otp-phone-number" class="form-control" placeholder="phone number" required>
                 <br>
                 <input id="otp-vehicle-id" class="form-control" placeholder="vehicle serial number">
                 </input>
@@ -42,7 +42,7 @@
                 <button id="send-otp" class="btn btn-success">SEND OTP</button>
 
                 <h3> *** RESET</h3>
-                <input id="reset-phone-number" class="form-control" placeholder="phone number">
+                <input type='tel' id="reset-phone-number" class="form-control" placeholder="phone number" required>
                 <br>
                 <input id="reset-vehicle-id" class="form-control" placeholder="vehicle serial number">
                 </input>

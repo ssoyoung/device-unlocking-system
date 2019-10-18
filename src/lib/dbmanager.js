@@ -1,7 +1,5 @@
-var tracer = require('tracer');
 var mongodb = require('./mongodb-connection');
 var mongoose = require('mongoose');
-const logger = tracer.colorConsole();
 
 const UserAccount= require('./UserAccountModel');
 const Vehicle = require('./VehicleModel');
@@ -15,6 +13,13 @@ const updateOptions = {
 };
 
 var timerMap = new Map();
+
+const Validator = require('./Validator');
+const validator = new Validator();
+
+var tracer = require('tracer');
+const logger = tracer.colorConsole();
+
 /*
  * function for create user
  */
@@ -29,6 +34,8 @@ async function createUser(userInfo, createCb)
             return;
         }
         const phoneNumber = userInfo.phoneNumber;
+
+        await validator.validatePhoneNumber(phoneNumber);
         const condition = {
             phoneNumber: phoneNumber
         };
@@ -59,9 +66,18 @@ async function createUser(userInfo, createCb)
 
     } catch(err) {
         logger.error(err);
+        let code = 500;
+        let message = 'internal server error';
+        if(err.code) {
+            code = err.code;
+        }
+        if(err.message) {
+            message = err.message;
+        }
+
         createCb({
-            code: 500,
-            message: 'internal server error'
+            code: code,
+            message: message
         });
     }
 
@@ -598,6 +614,7 @@ async function resetProcess(resetInfo, resetCb)
         });
     }
 }
+
 
 exports.createUser = createUser;
 exports.createVehicle = createVehicle;
