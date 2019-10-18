@@ -26,6 +26,7 @@ async function createUser(userInfo, createCb)
                 code: 400,
                 message: 'empty info entered'
             });
+            return;
         }
         const phoneNumber = userInfo.phoneNumber;
         const condition = {
