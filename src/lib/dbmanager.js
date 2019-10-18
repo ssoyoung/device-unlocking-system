@@ -14,7 +14,7 @@ const updateOptions = {
 
 var timerMap = new Map();
 
-const Validator = require('./Validator');
+const Validator = require('./validator');
 const validator = new Validator();
 
 var tracer = require('tracer');
