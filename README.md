@@ -29,6 +29,13 @@ STEP 1. Run docker compose build (where docker-compose.yml file exists)
             - when you see below message in console, you can use device-unlocking-system
             
             unlocking-server  | success to connect mongo DB!
+         - If still not working, restart unlocking-server container once again(1), or restart all containers (2)
+            (1) restart unlocking-server container
+                $ docker unlocking-server restart
+
+            (2) restart all containers
+                $ docker-compose down
+                $ docker-compose up
 
    STEP 3. Go to client website for test
         
@@ -90,5 +97,4 @@ STEP 1. Run docker compose build (where docker-compose.yml file exists)
 - to do list
     1. Code Refactoring & Stablization
     2. Unit test code (Behavioral Driven Testing)
-    3. Phone number validation check
-    4. API Doxygen
+    3. API Doxygen
