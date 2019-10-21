@@ -147,40 +147,12 @@ async function createVehicle(vehicleInfo, createCb)
 }
 
 /*
- * function for making & OTP
+ * function for making OTP
  */
 async function makeOtp(phoneNumber, vin, makeCb)
 {
     try {
-        const vhCondition = {
-            vin: vin
-        };
-        let vhFound = await Vehicle.findOne(vhCondition);
-        // logger.log(vhFound);
-
-        // error handling
-        if(vhFound === null) {
-            makeCb({
-                code : 404,
-                message: 'no such vehicle exist'
-            });
-            return;
-        }
-        if(vhFound.usability === false) {
-            makeCb({
-                code : 400,
-                message: 'can not use that vehicle, please contact agent'
-            });
-            return;
-
-        }
-        if(vhFound.paired === true) {
-            makeCb({
-                code: 400,
-                message: 'already paired'
-            });
-            return;
-        }
+        await vehicleAvailabilityCheck(vin);
 
         const userCondition = {
             phoneNumber: phoneNumber
@@ -203,11 +175,10 @@ async function makeOtp(phoneNumber, vin, makeCb)
         
         const otpCode = await generateCode();
 
-        // save to user db
+        // update user document with generated otp code
         const updateCondition = {
             phoneNumber: phoneNumber
         };
-
         const updateUser = {
             otp : otpCode
         };
@@ -223,9 +194,19 @@ async function makeOtp(phoneNumber, vin, makeCb)
 
     } catch(err) {
         logger.error(err);
+
+        let code = 500;
+        let message = 'INTERNAL SERVER ERROR';
+
+        if(err.code) {
+            code = err.code;
+        }
+        if(err.message) {
+            message = err.message;
+        }
         makeCb({
-            code: 500,
-            message: 'internal server error'
+            code: code,
+            message: message
         });
         return;
     }    
@@ -255,20 +236,74 @@ async function generateCode()
 }
 
 /*
- * function for OTP checker
+ * function for checking vehicle availability
+ * : vehicle existence check / usability & paired fields check 
+ */
+async function vehicleAvailabilityCheck(vin)
+{
+    return new Promise((resolve, reject) => {
+        const vhCondition = {
+            vin: vin
+        };
+        Vehicle.findOne(vhCondition).then((vhFound) => {
+
+            if(vhFound === null) {
+                reject({
+                    code : 404,
+                    message: 'no such vehicle exist'
+                });
+                return;
+            }
+            if(vhFound.usability === false) {
+                reject({
+                    code : 400,
+                    message: 'can not use that vehicle, please contact agent'
+                });
+                return;
+            }
+
+            if(vhFound.paired === true) {
+                reject({
+                    code: 400,
+                    message: 'already paired'
+                });
+                return;
+            }
+
+            resolve({
+                code: 200,
+                message: 'available vehicle'
+            });
+    
+            return;
+        }).catch((vhErr)=>{
+            logger.error(vhErr);
+            reject({
+                code: 500,
+                message: 'INTERNAL SERVER ERROR'
+            });
+            return;
+        });
+    });
+}
+
+/*
+ * function for checking entered OTP
  */
 async function otpCheck(info, checkCb)
 {
     const phoneNumber = info.phoneNumber;
-    // const vin = info.vin;
+    const vin = info.vin;
     const otp = info.otp;
-
+        
     // mongo transaction session
     const session = await mongoose.startSession();
     session.startTransaction();
-    // const opts = { session };
     
     try {
+        // Vehicle availability check
+        await vehicleAvailabilityCheck(vin);
+
         const userCondition = {
             phoneNumber : phoneNumber
         };
@@ -306,7 +341,6 @@ async function otpCheck(info, checkCb)
                 message: 'otp matched!'
             });
 
-
             return;
         } else {
 
@@ -328,9 +362,17 @@ async function otpCheck(info, checkCb)
         await session.abortTransaction();
         session.endSession();
 
+        let code = 500;
+        let message = 'INTERNAL SERVER ERROR';
+        if(err.code) {
+            code = err.code;
+        }
+        if(err.message){
+            message = err.message;
+        }
         checkCb({
-            code: 500,
-            message: err
+            code: code,
+            message: message
         });
     }
 }
