@@ -424,7 +424,10 @@ async function startPairing(vin, pairingCb)
 }
 
 /*
- * function for checking pairing code equals or not
+ * function for checking pairing code
+ *   if pairing code matches,
+ *   then update UserAccount, Vehicle Document,
+ *   and cancel timer
  */
 async function checkPairing(pairingData, pairingCb) {
     const phoneNumber = pairingData.phoneNumber;
@@ -434,7 +437,7 @@ async function checkPairing(pairingData, pairingCb) {
     // mongo transaction session
     const session = await mongoose.startSession();
     session.startTransaction();
-    
+
     try {
         const vhCondition = {
             vin: vin,
@@ -442,6 +445,8 @@ async function checkPairing(pairingData, pairingCb) {
             paired: false,
             pairCode: pairCode
         };
+
+        // 1. Check Pairing Code
         let vhFound = await Vehicle.findOne(vhCondition);
         if(vhFound === null) {
             logger.error('wrong info');
@@ -449,12 +454,12 @@ async function checkPairing(pairingData, pairingCb) {
             session.endSession();    
             pairingCb({
                 code: 404,
-                message: 'wrong pairing info entered or already paired'
+                message: 'wrong pairing code entered or vehicle is already paired'
             });
             return;    
         }
 
-
+        // 2. Update User Document
         const userCondition  = {
             phoneNumber : phoneNumber,
             vins: {$ne: vin}
@@ -470,7 +475,7 @@ async function checkPairing(pairingData, pairingCb) {
             return;    
         }
 
-        // set vins : vin
+        // set vins : vin, retry 0, otp ''
         const vinInfoUser = {
             vin : vin,
             history : []
@@ -478,24 +483,17 @@ async function checkPairing(pairingData, pairingCb) {
         let updateData = {
             vins: vinInfoUser
         };
-        await UserAccount.updateOne(userCondition, {$push: updateData}, updateOptions);
-
-        // set retry 0
-        // set otp ''
-        updateData = {
-            retry: 0,
-            otp : ''
-        };
-        await UserAccount.updateOne(userCondition, updateData, updateOptions);
+        await UserAccount.updateOne(userCondition, {$push: updateData, retry: 0, otp: ''}, updateOptions);
    
-        
-        // Update Vehicle Document
+   
+        // 3. Update Vehicle Document
         // set paired : true, phoneNumber: phoneNumber
         await Vehicle.updateOne(vhCondition, {paired: true, phoneNumber: phoneNumber});
         await session.commitTransaction();
         session.endSession();
 
-        // cancel timer
+
+        // 4. Cancel timer
         if(timerMap.has(vin)) {
             const timerId = timerMap.get(vin);
             clearTimeout(timerId);

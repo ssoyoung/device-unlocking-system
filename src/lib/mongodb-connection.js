@@ -92,7 +92,7 @@ async function initCollection()
 
     // Account Collection
     try {
-        let findCb = await UserAccount.findOne({phoneNumber: 'na'});
+        let findCb = await UserAccount.findOne({phoneNumber: '000-0000-0000'});
         if(findCb === null) {
             logger.debug('make new user account document');
 
