@@ -21,11 +21,12 @@ var tracer = require('tracer');
 const logger = tracer.colorConsole();
 
 /*
- * function for create user
+ * function for creating user
  */
 async function createUser(userInfo, createCb)
 {
     try {
+        // data payload check
         if(userInfo === null || userInfo.phoneNumber === null || userInfo.phoneNumber.length === 0) {
             createCb({
                 code: 400,
@@ -35,11 +36,13 @@ async function createUser(userInfo, createCb)
         }
         const phoneNumber = userInfo.phoneNumber;
 
+        // phone number validation check
         await validator.validatePhoneNumber(phoneNumber);
         const condition = {
             phoneNumber: phoneNumber
         };
 
+        // user existence check
         let found = await UserAccount.find(condition);
         logger.debug(found.length);
         if(found.length !== 0) {
@@ -57,6 +60,7 @@ async function createUser(userInfo, createCb)
             retry: 0
         });
 
+        // save to UserAccount Collection
         await ua.save();
         createCb({
             code: 201,
@@ -84,11 +88,20 @@ async function createUser(userInfo, createCb)
 }
 
 /*
- * function for create vehicle
+ * function for creating vehicle
  */
 async function createVehicle(vehicleInfo, createCb)
 {
     try {
+        // data payload check
+        if(vehicleInfo === null || vehicleInfo.vin === null || vehicleInfo.vin.length === 0) {
+            createCb({
+                code: 400,
+                message: 'empty info entered'
+            });
+            return;
+        }
+
         const vin = vehicleInfo.vin;
         const condition = {
             vin: vin
@@ -104,6 +117,8 @@ async function createVehicle(vehicleInfo, createCb)
             return;
         }
 
+        // TBD
+        // DOES IT REALLY NEEDED IN FIRST STEP????
         const pairCode = await generateCode();
 
         let ua = new Vehicle({
@@ -132,7 +147,7 @@ async function createVehicle(vehicleInfo, createCb)
 }
 
 /*
- * function for make OTP
+ * function for making & OTP
  */
 async function makeOtp(phoneNumber, vin, makeCb)
 {
@@ -141,7 +156,6 @@ async function makeOtp(phoneNumber, vin, makeCb)
             vin: vin
         };
         let vhFound = await Vehicle.findOne(vhCondition);
-        // logger.log('#####');
         // logger.log(vhFound);
 
         // error handling
@@ -218,7 +232,8 @@ async function makeOtp(phoneNumber, vin, makeCb)
 }
 
 /*
- * function for making OTP & PAIRING code
+ * function for generating random code
+ * (used for OTP & Pairing Code)
  */
 async function generateCode()
 {
@@ -267,6 +282,7 @@ async function otpCheck(info, checkCb)
             return;
         }
 
+        // retrial check
         if(userFound.retry >= 3) {
             checkCb({
                 code: 401,
@@ -321,7 +337,6 @@ async function otpCheck(info, checkCb)
 
 /*
  * function for making & sending pairing code
- * (by compairing pairing code)
 */
 async function startPairing(vin, pairingCb)
 {
@@ -339,6 +354,7 @@ async function startPairing(vin, pairingCb)
     };
 
     try {
+        // 1. vehicle existence check
         const found = await Vehicle.findOne(findCondition);
         if(found === null) {
             pairingCb({
@@ -347,14 +363,15 @@ async function startPairing(vin, pairingCb)
             });
             return;
         }
-        
+
+        // 2. update vehicle DB with generated pairing code
         await Vehicle.findOneAndUpdate(findCondition, updateData, updateOptions);
         pairingCb({
             code: 200,
             message: pairCode
         });
 
-        // set time out during 2 min
+        // 3. set time out during 2 min
         const timerId = setTimeout(() => {
 
             const updateCondition = {
@@ -514,7 +531,7 @@ async function setVehicleLock(vhInfo, lockCb)
         const foundOne = await Vehicle.findOne({vin: vhInfo.vin});
         if(foundOne === null) {
             lockCb({
-                code: 400,
+                code: 404,
                 message: 'no such vehicle exist'
             });
             return;
