@@ -573,10 +573,10 @@ async function resetProcess(resetInfo, resetCb)
         const userCondition = {
             phoneNumber: resetInfo.phoneNumber
         };
-        // BUG : DOES NOT PROPERY WORKED
+
         const userUpdate=  {
             retry: 0,
-            $pull: {'vins': {'vin' : [resetInfo.vin]}}
+            $pull: {'vins': {'vin' : resetInfo.vin}}
         };
 
         const updated = await UserAccount.findOneAndUpdate(userCondition, userUpdate, updateOptions);
