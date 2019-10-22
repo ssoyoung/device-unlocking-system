@@ -631,7 +631,7 @@ async function resetProcess(resetInfo, resetCb)
         const vhCondition = {
             vin: resetInfo.vin
         };
-        const foundVh = Vehicle.findOne(vhCondition);
+        const foundVh = await Vehicle.findOne(vhCondition);
         if(foundVh === null) {
             await session.abortTransaction();
             session.endSession();
