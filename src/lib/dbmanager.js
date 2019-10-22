@@ -601,8 +601,10 @@ async function setVehicleLock(vhInfo, lockCb)
 /*
  * function for reset all pairing process
  */
-async function resetProcess(resetInfo, resetCb)
+async function resetProcess(resetInfo)
 {
+    // TODO : resetInfo null body check
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -619,13 +621,10 @@ async function resetProcess(resetInfo, resetCb)
 
         const updated = await UserAccount.findOneAndUpdate(userCondition, userUpdate, updateOptions);
         if(updated === null) {
-            await session.abortTransaction();
-            session.endSession();        
-            resetCb({
+            throw({
                 code: 404,
                 message : 'no such user exist'
             });
-            return;
         }
 
         const vhCondition = {
@@ -633,13 +632,10 @@ async function resetProcess(resetInfo, resetCb)
         };
         const foundVh = await Vehicle.findOne(vhCondition);
         if(foundVh === null) {
-            await session.abortTransaction();
-            session.endSession();
-            resetCb({
+            throw ({
                 code: 404,
                 message : 'no such vehicle exist'
             });
-            return;
         }
         
         const vhUpdate = {
@@ -651,20 +647,29 @@ async function resetProcess(resetInfo, resetCb)
         await session.commitTransaction();
         session.endSession();    
 
-        resetCb({
+        return({
             code: 200,
             message: 'reset successfully'
         });
 
     } catch (err) {
+        logger.error(err);
+
+        // cancel transaction
         await session.abortTransaction();
         session.endSession();
 
-        logger.error(err);
-        resetCb({
-            code: 500,
-            message: 'INTERNAL SERVER ERROR'
-        });
+        let code = 500;
+        let message = 'INTERNAL SERVER ERROR';
+
+        if(err.code)
+            code = err.code;
+        if(err.message)
+            message = err.message;
+        throw {
+            code: code,
+            message: message
+        };
     }
 }
 

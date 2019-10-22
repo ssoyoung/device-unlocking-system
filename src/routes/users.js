@@ -21,9 +21,13 @@ router.put('/', function(req, res) {
   : reset specific user's retry field value to 0
  */
 router.post('/reset', function(req, res) {
-    dbmanager.resetProcess(req.body, (resetCb) => {
-        res.status(resetCb.code).send(resetCb.message);
-    });
+    dbmanager.resetProcess(req.body)
+        .then((resetCb) => {
+            res.status(resetCb.code).send(resetCb.message);
+        })
+        .catch((err) => {
+            res.status(err.code).send(err.message);
+        });
 });
 
 
