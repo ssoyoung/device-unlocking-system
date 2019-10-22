@@ -7,9 +7,13 @@ var dbmanager = require('../lib/dbmanager');
  : create users
  */
 router.put('/', function(req, res) {
-    dbmanager.createUser(req.body, (createCb) => {
-        res.status(createCb.code).send(createCb.message);
-    });
+    dbmanager.createUser(req.body)
+        .then((createCb) => {
+            res.status(createCb.code).send(createCb.message);
+        })
+        .catch((err) => {
+            res.status(err.code).send(err.message);
+        });
 });
 
 /*

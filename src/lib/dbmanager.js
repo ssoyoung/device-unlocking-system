@@ -23,16 +23,15 @@ const logger = tracer.colorConsole();
 /*
  * function for creating user
  */
-async function createUser(userInfo, createCb)
+async function createUser(userInfo)
 {
     try {
         // data payload check
         if(userInfo === null || userInfo.phoneNumber === null || userInfo.phoneNumber.length === 0) {
-            createCb({
+            throw{
                 code: 400,
                 message: 'empty info entered'
-            });
-            return;
+            };
         }
         const phoneNumber = userInfo.phoneNumber;
 
@@ -44,13 +43,11 @@ async function createUser(userInfo, createCb)
 
         // user existence check
         let found = await UserAccount.find(condition);
-        logger.debug(found.length);
         if(found.length !== 0) {
-            createCb({
+            throw{
                 code : 409,
                 message: 'Same Account ID exist'
-            });
-            return;
+            };
         }
 
         let ua = new UserAccount({
@@ -62,11 +59,10 @@ async function createUser(userInfo, createCb)
 
         // save to UserAccount Collection
         await ua.save();
-        createCb({
+        return({
             code: 201,
             message: 'user account create successfully!'
         });
-        return;
 
     } catch(err) {
         logger.error(err);
@@ -79,10 +75,10 @@ async function createUser(userInfo, createCb)
             message = err.message;
         }
 
-        createCb({
+        throw{
             code: code,
             message: message
-        });
+        };
     }
 
 }
