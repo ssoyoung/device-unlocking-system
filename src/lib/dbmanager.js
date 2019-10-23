@@ -86,16 +86,15 @@ async function createUser(userInfo)
 /*
  * function for creating vehicle
  */
-async function createVehicle(vehicleInfo, createCb)
+async function createVehicle(vehicleInfo)
 {
     try {
         // data payload check
         if(vehicleInfo === null || vehicleInfo.vin === null || vehicleInfo.vin.length === 0) {
-            createCb({
+            throw({
                 code: 400,
                 message: 'empty info entered'
             });
-            return;
         }
 
         const vin = vehicleInfo.vin;
@@ -106,11 +105,10 @@ async function createVehicle(vehicleInfo, createCb)
         let found = await Vehicle.find(condition);
         logger.debug(found.length);
         if(found.length !== 0) {
-            createCb({
+            throw({
                 code : 409,
                 message: 'Same Vehicle exist'
             });
-            return;
         }
 
         // TBD
@@ -127,17 +125,22 @@ async function createVehicle(vehicleInfo, createCb)
         });
 
         await ua.save();
-        createCb({
+        return({
             code: 201,
             message: 'vehicle create successfully!'
         });
-        return;
 
     } catch(err) {
         logger.error(err);
-        createCb({
-            code: 500,
-            message: 'internal server error'
+        let code = 500;
+        let message = 'INTERNAL SERVER ERROR';
+        if(err.code)
+            code = err.code;
+        if(err.message)
+            message = err.message;
+        throw({
+            code: code,
+            message: message
         });
     }
 }

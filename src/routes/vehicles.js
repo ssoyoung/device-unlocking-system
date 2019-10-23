@@ -7,13 +7,16 @@ var dbmanager = require('../lib/dbmanager');
  : create vehicle
  */
 router.put('/', function(req, res) {
-    if(req.body === null || req.body.length === 0) {
+    if(typeof req === 'undefined' || req === null || req.body === null || req.body.length === 0) {
         res.status(400);
     }
     else {
-        dbmanager.createVehicle(req.body, (createCb) => {
-            res.status(createCb.code).send(createCb.message);
-        });
+        dbmanager.createVehicle(req.body)
+            .then((createCb) => {
+                res.status(createCb.code).send(createCb.message);
+            }).catch((err) => {
+                res.status(err.code).send(err.message);
+            });
     }
 });
 
