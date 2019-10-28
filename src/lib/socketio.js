@@ -15,16 +15,11 @@ io.on('connection', function(socket){
         const phoneNumber = data.phoneNumber;
         const vin = data.vin;
 
-        dbmanager.makeOtp(phoneNumber, vin, (makeCb) => {
-
-            if(makeCb.code !== 200) {
-                socket.emit('no otp', makeCb.message, '(' + makeCb.code +')');
-            } else {
-                const otpData = makeCb.message;
-                socket.emit('new otp', otpData);    
-            }
+        dbmanager.makeOtp(phoneNumber, vin).then((makeOtpCb) => {
+            socket.emit('new otp', makeOtpCb.message);
+        }).catch((makeOtpErr) => {
+            socket.emit('no otp', makeOtpErr.message, '(' + makeOtpErr.code +')');
         });
-
     });
 
     socket.on('send otp', function(data) {

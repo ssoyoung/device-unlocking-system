@@ -148,7 +148,7 @@ async function createVehicle(vehicleInfo)
 /*
  * function for making OTP
  */
-async function makeOtp(phoneNumber, vin, makeCb)
+async function makeOtp(phoneNumber, vin)
 {
     try {
         await vehicleAvailabilityCheck(vin);
@@ -158,18 +158,16 @@ async function makeOtp(phoneNumber, vin, makeCb)
         };
         let userFound = await UserAccount.findOne(userCondition);
         if(userFound === null) {
-            makeCb({
+            throw({
                 code: 404,
                 message: 'no such user exist'
             });
-            return;
         }
         if(userFound.retry >= 3) {
-            makeCb({
+            throw({
                 code: 401,
                 message: 'retry OTP exceed. please contact customer agent'
             });
-            return;
         }
         
         const otpCode = await generateCode();
@@ -184,12 +182,10 @@ async function makeOtp(phoneNumber, vin, makeCb)
 
         await UserAccount.findOneAndUpdate(updateCondition, updateUser, updateOptions); 
 
-        makeCb({
+        return({
             code: 200,
             message: otpCode
         });
-
-        return;
 
     } catch(err) {
         logger.error(err);
@@ -203,11 +199,10 @@ async function makeOtp(phoneNumber, vin, makeCb)
         if(err.message) {
             message = err.message;
         }
-        makeCb({
+        throw({
             code: code,
             message: message
         });
-        return;
     }    
 }
 
