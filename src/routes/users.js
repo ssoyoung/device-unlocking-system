@@ -16,6 +16,15 @@ router.put('/', function(req, res) {
         });
 });
 
+router.delete('/', function(req, res) {
+    dbmanager.deleteUser(req.body)
+        .then((deleteCb) => {
+            res.status(deleteCb.code).send(deleteCb.message);
+        }).catch((err) => {
+            res.status(err.code).send(err.message);
+        });
+});
+
 /*
  * POST /users/reset
   : reset specific user's retry field value to 0

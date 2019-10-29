@@ -37,11 +37,11 @@ async function createUser(userInfo)
 
         // phone number validation check
         await validator.validatePhoneNumber(phoneNumber);
+
+        // user existence check
         const condition = {
             phoneNumber: phoneNumber
         };
-
-        // user existence check
         let found = await UserAccount.find(condition);
         if(found.length !== 0) {
             throw{
@@ -71,6 +71,9 @@ async function createUser(userInfo)
         if(err.code) {
             code = err.code;
         }
+        if(err.status) {
+            code = err.status;
+        }
         if(err.message) {
             message = err.message;
         }
@@ -82,6 +85,48 @@ async function createUser(userInfo)
     }
 
 }
+
+/*
+ * function for deleting user
+ */
+async function deleteUser(userInfo)
+{
+    try {
+        const condition = {
+            phoneNumber: userInfo.phoneNumber
+        };
+
+        // user existence check
+        let found = await UserAccount.findOne(condition);
+        if(found === null) {
+            throw{
+                code : 404,
+                message: 'no such user exist'
+            };
+        }
+
+        await UserAccount.deleteOne(condition);
+
+        logger.debug('successfully delete');
+        return {
+            code: 204,
+            message: 'successfully delete'
+        };
+    } catch (err) {
+        let code = 500;
+        let message = 'INTERNAL SERVER ERROR';
+        if(err.code)
+            code = err.code;
+        if(err.message)
+            message = err.message;
+        
+        throw {
+            code : code,
+            message: message
+        };
+    }
+}
+
 
 /*
  * function for creating vehicle
@@ -673,6 +718,7 @@ async function resetProcess(resetInfo)
 
 
 exports.createUser = createUser;
+exports.deleteUser = deleteUser;
 exports.createVehicle = createVehicle;
 exports.makeOtp = makeOtp;
 exports.otpCheck = otpCheck;
